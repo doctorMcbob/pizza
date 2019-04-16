@@ -42,38 +42,38 @@ player = {
 }
 
 ########### ------------ INTRO SCENE ------------
-# walls = [makeplatform((0, 0, 5, 700), invisible=True), makeplatform((800, 0, 200, 600)), makeplatform((0, 680, 1000, 20)), ]
-# FLAG = False
-# COUNT = 0
-# def doortrigger(this, game): 
-# 	global FLAG, COUNT
-# 	COUNT += 1
-# 	if COUNT > 40:
-# 		FLAG = True
+walls = [makeplatform((0, 0, 5, 700), invisible=True), makeplatform((800, 0, 200, 600)), makeplatform((0, 680, 1000, 20)), ]
+FLAG = False
+COUNT = 0
+def doortrigger(this, game): 
+	global FLAG, COUNT
+	COUNT += 1
+	if COUNT > 40:
+		FLAG = True
 
-# door = {
-# 	'name':'door',
-#  	'rect':pygame.rect.Rect(800, 600, 200, 80),
-#  	'color': (0, 0, 0),
-#  	'trigger function': doortrigger
-#  }
-# drawing = [[pygame.rect.Rect(720, 600, 75, 29), (150, 150, 100)], [pygame.rect.Rect(720, 595, 80, 2), (0, 0, 0)]]
+door = {
+	'name':'door',
+ 	'rect':pygame.rect.Rect(800, 600, 200, 80),
+ 	'color': (0, 0, 0),
+ 	'trigger function': doortrigger
+ }
+drawing = [[pygame.rect.Rect(720, 600, 75, 29), (150, 150, 100)], [pygame.rect.Rect(720, 595, 80, 2), (0, 0, 0)]]
 
-# while not FLAG:
-# 	SCREEN.fill((255, 255, 255))
-# 	for rect, color in drawing:
-# 		pygame.draw.rect(SCREEN, color, rect)
-# 	SCREEN.blit(TF1.render("Enter",0,(0,0,0)), (722, 602))
-# 	render_input({"player":player})
-# 	move_and_collision(player, walls)
-# 	trigger(door, player, None)
-# 	for actor in [door, player] + walls:
-# 		if 'advance function' in actor: actor['advance function'](actor)
-# 		draw(actor, SCREEN)
-# 	SCREEN.blit(TF1.render("PiZZA PETE'S",0,(0,0,0)), (100, 100))
-# 	SCREEN.blit(TF2.render("PUZZLE PALACE",0,(0,0,0)), (100, 126))
-# 	pygame.display.update()
-# 	CLOCK.tick(30)
+while not FLAG:
+	SCREEN.fill((255, 255, 255))
+	for rect, color in drawing:
+		pygame.draw.rect(SCREEN, color, rect)
+	SCREEN.blit(TF1.render("Enter",0,(0,0,0)), (722, 602))
+	render_input({"player":player})
+	move_and_collision(player, walls)
+	trigger(door, player, None)
+	for actor in [door, player] + walls:
+		if 'advance function' in actor: actor['advance function'](actor)
+		draw(actor, SCREEN)
+	SCREEN.blit(TF1.render("PiZZA PETE'S",0,(0,0,0)), (100, 100))
+	SCREEN.blit(TF2.render("PUZZLE PALACE",0,(0,0,0)), (100, 126))
+	pygame.display.update()
+	CLOCK.tick(30)
 
 ########### ------------ GAME SCENE -------------
 player['rect'].x, player['rect'].y = (700, 600)
