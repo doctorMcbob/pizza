@@ -14,7 +14,7 @@ TF2 = pygame.font.SysFont("Helvetica", 50) #That Font's Zappin Mah Sentry!
 
 def jmprefresh(this, **kwargs): 
 	if this['state'] == 'stand': this['jumps'] = 1
-def pressbtn(this, level={}):
+def pressbtn(this, level={"btns":[]}):
 	for btn in level['btns']:
 		if btn['state'] == 'pressable': btn['press'](btn)
 player = {
@@ -64,7 +64,7 @@ while not FLAG:
 	for rect, color in drawing:
 		pygame.draw.rect(SCREEN, color, rect)
 	SCREEN.blit(TF1.render("Enter",0,(0,0,0)), (722, 602))
-	render_input({"player":player})
+	render_input({"player":player, 'btns':[]})
 	move_and_collision(player, walls)
 	trigger(door, player, None)
 	for actor in [door, player] + walls:
@@ -176,7 +176,7 @@ def resolve_queue():
 			if qhead[0] == "L":
 				if board[POS[1]][POS[0]-1] is None:
 					board[POS[1]][POS[0]] = None
-					POS[0] -= 1
+					POS[0] = max(0, POS[0]-1)
 					board[POS[1]][POS[0]] = piece
 			if qhead[0] == "R":
 				if board[POS[1]][POS[0]+1] is None:
@@ -259,6 +259,7 @@ def platformer_step(level):
 
 t = CLOCK.tick(30)
 while step():
+	za = check()
 	t += CLOCK.tick(30)
 	resolve_queue()
 	drawboard(SCREEN, board)
@@ -266,11 +267,7 @@ while step():
 	drawnext(SCREEN, next)
 	platformer_step(level1)
 	pygame.display.update()
-	za = check()
 	if za:
-		POS = [3,0]
-		piece = nextp
-		nextp = mkpiece()
 		t=0
 		while t<(1000):
 			drawboard(SCREEN, board)
@@ -280,6 +277,10 @@ while step():
 			platformer_step(level1)
 			pygame.display.update()
 			t+=CLOCK.tick(30)
+		if tuple(POS) in [(za[0],za[1]),(za[0]+1,za[1]),(za[0],za[1]+1),(za[0]+1,za[1]+1)]:
+			POS = [3, 0]
+			piece = nextp
+			nextp = mkpiece()
 		if board[za[1]][za[0]] + board[za[1]+1][za[0]+1] in ORDERS:
 			ORDERS.remove(board[za[1]][za[0]] + board[za[1]+1][za[0]+1])
 		else:
