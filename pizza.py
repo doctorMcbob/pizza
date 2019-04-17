@@ -100,7 +100,7 @@ def resolve_queue():
 			if qhead[0] == "L":
 				if board[POS[1]][POS[0]-1] is None:
 					board[POS[1]][POS[0]] = None
-					POS[0] -= 1
+					POS[0] = max(0, POS[0]-1)
 					board[POS[1]][POS[0]] = piece
 			if qhead[0] == "R":
 				if board[POS[1]][POS[0]+1] is None:
@@ -167,6 +167,7 @@ def check():
 
 t = CLOCK.tick(30)
 while step():
+	za = check()
 	t += CLOCK.tick(30)
 	inputrender()
 	resolve_queue()
@@ -174,12 +175,7 @@ while step():
 	draworders(SCREEN, ORDERS)
 	drawnext(SCREEN, next)
 	pygame.display.update()
-	za = check()
 	if za:
-		POS = [3,0]
-		piece = nextp
-		nextp = mkpiece()
-		t=0
 		while t<(1000):
 			drawboard(SCREEN, board)
 			draworders(SCREEN, ORDERS)
@@ -187,6 +183,10 @@ while step():
 			SCREEN.blit(IMG["CRUST"], ((za[0]*60)+50,(za[1]*60)+50))
 			pygame.display.update()
 			t+=CLOCK.tick(30)
+		if tuple(POS) in [(za[0],za[1]),(za[0]+1,za[1]),(za[0],za[1]+1),(za[0]+1,za[1]+1)]:
+			POS = [3, 0]
+			piece = nextp
+			nextp = mkpiece()
 		if board[za[1]][za[0]] + board[za[1]+1][za[0]+1] in ORDERS:
 			ORDERS.remove(board[za[1]][za[0]] + board[za[1]+1][za[0]+1])
 		else:
