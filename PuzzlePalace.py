@@ -25,7 +25,7 @@ player = {
 	'y vel': 0,
 	'state': 'stand',
 	'jumps': 1,
-	'jump vel': -10,
+	'jump vel': -12,
 	'grav': 1,
 	'speed': 5,
 	'walk speed': 5,
@@ -170,7 +170,7 @@ def drawnext(SCREEN, next, X=415, Y=20):
 	SCREEN.blit(HEL20.render("Next", 0, (0,0,0)), (X+30, Y+48))
 
 def resolve_queue():
-	global qhead, qtail, board, POS, piece
+	global qhead, qtail, board, POS, piece, nextp
 	while True:
 		try:
 			if qhead[0] == "L":
@@ -188,6 +188,9 @@ def resolve_queue():
 					board[POS[1]][POS[0]] = None
 					POS[1] += 1
 					board[POS[1]][POS[0]] = piece
+
+			if qhead[0] in ["P", "V", "C"]:
+				nextp = qhead[0]
 		except IndexError:
 			pass
 
@@ -242,10 +245,36 @@ def check():
 	return None
 
 level1 = {
+	"limit": 10,
 	"player":player,
 	"platforms": [makeplatform(rect) for rect in [(640, 680, 380, 20),(640, 300, 380, 20),(640,320,20,360),(980,320,20,360)]],
-	"btns": [mkbtn((680, 670, 25, 10), "L"), mkbtn((935, 670, 25, 10), "R"), mkbtn((800, 670, 25, 10), "D")],
+	"btns": [mkbtn((680, 640, 20, 20), "L"), mkbtn((935, 640, 20, 20), "R"), mkbtn((800, 640, 20, 20), "D")],
 }
+level2 = {
+	"limit": 10.,
+	"player":player,
+	"platforms": [makeplatform(rect) for rect in [(640, 680, 380, 20),(640, 300, 380, 20),(640,320,20,360),(980,320,20,360)]],
+	"btns": [mkbtn((680, 610, 20, 20), "L"), mkbtn((935, 610, 20, 20), "R"), mkbtn((800, 610, 20, 20), "D")],
+}
+level3 = {
+	"limit": 10,
+	"player":player,
+	"platforms": [makeplatform(rect) for rect in [
+		(640, 680, 380, 20),(640, 300, 380, 20),(640, 320, 20, 360),(980, 320, 20, 360),
+		(660, 640, 40, 20),(940, 640, 40, 20),(730, 590, 40, 20),(870, 590, 40, 20),(800, 550, 40, 20)
+		]],
+	"btns": [
+		mkbtn((725, 640, 20, 20), "P"), mkbtn((895, 640, 20, 20), "C"), mkbtn((810, 640, 20, 20), "V"),
+		mkbtn((740, 550, 20, 20), "L"), mkbtn((880, 550, 20, 20), "R"), mkbtn((810, 510, 20, 20), "D"),
+	],
+}
+levels = [level1, level2, level3]
+clears = 0
+level = 0
+def drawclears(SCREEN):
+	global level, levels, clears
+	SCREEN.blit(HEL20.render("LEVEL: "+str(level+1)+" NEXT LEVEL IN: "+str(levels[level]['limit']-clears),0,(0,0,0)), (640, 270))
+
 
 def platformer_step(level):
 	render_input(level)
@@ -257,6 +286,7 @@ def platformer_step(level):
 			trigger(actor, level['player'], level)
 		draw(actor, SCREEN)
 
+
 t = CLOCK.tick(30)
 while step():
 	za = check()
@@ -265,14 +295,17 @@ while step():
 	drawboard(SCREEN, board)
 	draworders(SCREEN, ORDERS)
 	drawnext(SCREEN, next)
-	platformer_step(level1)
+	drawclears(SCREEN)
+	platformer_step(levels[level])
 	pygame.display.update()
 	if za:
 		t=0
+		clears += 1
 		while t<(1000):
 			drawboard(SCREEN, board)
 			draworders(SCREEN, ORDERS)
 			drawnext(SCREEN, next)
+			drawclears(SCREEN)
 			SCREEN.blit(IMG["CRUST"], ((za[0]*60)+50,(za[1]*60)+50))
 			platformer_step(level1)
 			pygame.display.update()
@@ -288,5 +321,10 @@ while step():
 		ORDERS.append(mkorder())
 		for x, y in [(za[0],za[1]),(za[0]+1,za[1]),(za[0],za[1]+1),(za[0]+1,za[1]+1)]:
 			board[y][x] = None
-		
+		if clears >= levels[level]['limit']:
+			clears = 0
+			level += 1
+			if level >= len(levels): 
+				print("thats all i've programmed sorry")
+				break
 
