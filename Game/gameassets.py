@@ -6,8 +6,8 @@ from pygame.locals import *
 pygame.init()
 
 
-def SCROLLER(SCREEN, focus, actors):
-	surf = pygame.Surface(SCREEN.get_size())
+def SCROLLER(destination, focus, actors):
+	surf = pygame.Surface(destination.get_size())
 	surf.fill((255, 255, 255))
 	xmod, ymod = 0 - focus['rect'].x + ((surf.get_width()/2) - focus['rect'].w/2), 0 - focus['rect'].y + ((surf.get_height()/2) - focus['rect'].h/2)
 	for actor in actors:
@@ -17,11 +17,29 @@ def SCROLLER(SCREEN, focus, actors):
 
 FONT = pygame.font.SysFont("helvetica", 10)
 def draw(this, destination, modifier=(0,0)):
+	"""
+	expects dictionary with the following
+		'rect': a pygame.rect.Rect, 
+		
+		'img' : as either (a pygame.Surface, (x,y modifier from rect position)) or just a pygame.Surface 
+		OR
+		'color': (r,g,b)
+	"""
 	if 'invisable' in this and this['invisable']:
+		return
+	if 'img' in this:
+		if type(this['img']) is pygame.Surface:
+			img = this['img']
+		else:
+			img = this['img'][0]
+			modifier[0] += this['img'][1][0]
+			modifier[0] += this['img'][1][1]
+		destination.blit(img, (this['rect'].x + modifier[0], this['rect'].y + modifier[1]))	
 		return
 	rect = pygame.rect.Rect((this['rect'].x + modifier[0], this['rect'].y + modifier[1]), (this['rect'].w, this['rect'].h))
 	pygame.draw.rect(destination, this['color'], rect)
-	destination.blit(FONT.render(this['name'], 0, (0,0,0)), (this['rect'].x + modifier[0], this['rect'].y + modifier[1]))
+	if "name" in this:
+		destination.blit(FONT.render(this['name'], 0, (0,0,0)), (this['rect'].x + modifier[0], this['rect'].y + modifier[1]))
 	if 'state' in this:
 		destination.blit(FONT.render(this['state'], 0, (0,0,0)), (this['rect'].x + modifier[0], this['rect'].y + 10 + modifier[1]))
 
@@ -147,10 +165,11 @@ def makecollectable(rect, name, value):
 		"value":value,
 	}
 
-def player_jump(this, game):
+def player_jump(this, game, jmps=2):
 	if this['state'] == "stand":
-		this['jumps'] = 2
+		this['jumps'] = jmps
 
 def kill(this, game):
 	game["player"]['rect'] = pygame.rect.Rect(350, 150, 30, 40)
-	game["player"]["collectables"] = []
+	if "collectables" in game['player']:
+		game["player"]["collectables"] = []

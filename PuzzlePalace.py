@@ -12,14 +12,33 @@ SCREEN = pygame.display.set_mode((1000, 700))
 TF1 = pygame.font.SysFont("Helvetica", 25)
 TF2 = pygame.font.SysFont("Helvetica", 50) #That Font's Zappin Mah Sentry!
 
-def jmprefresh(this, **kwargs): 
+
+IMG = {
+	"C": pygame.image.load("bin/chs.png").convert(),
+	"P": pygame.image.load("bin/pep.png").convert(),
+	"V": pygame.image.load("bin/veg.png").convert(),
+	"CRUST": pygame.image.load("bin/crust.png").convert(),
+	"PLAYER":{
+		"stand": pygame.image.load("bin/player_stand.png").convert(),
+		"fall": pygame.image.load("bin/player_fall.png").convert(),
+	},
+}
+for key in IMG["PLAYER"]:
+	IMG["PLAYER"][key].set_colorkey((254, 255, 255))
+	IMG["PLAYER"][key] = [None, IMG["PLAYER"][key], pygame.transform.flip(IMG["PLAYER"][key], 1, 0)]
+
+IMG["CRUST"].set_colorkey((0, 0, 0))
+
+def player_advance(this, **kwargs): 
 	if this['state'] == 'stand': this['jumps'] = 1
+	this['img'] = IMG["PLAYER"][this['state']][this['direction']]
 def pressbtn(this, level={"btns":[]}):
 	for btn in level['btns']:
 		if btn['state'] == 'pressable': btn['press'](btn)
 player = {
 	'name': '@',
 	'rect': pygame.rect.Rect((50, 610), (20, 40)),
+	'img': IMG["PLAYER"]['stand'][1],
 	'color': (200, 150, 150),
 	'x vel': 0,
 	'y vel': 0,
@@ -31,7 +50,7 @@ player = {
 	'walk speed': 5,
 	'direction': 1,
 	'friction': 1,
-	'advance function': jmprefresh,
+	'advance function': player_advance,
 	'action': pressbtn,
 	'buttons': {
 		"left": K_LEFT,
@@ -96,13 +115,6 @@ def mkorder():
 	return mkpiece() + mkpiece()
 ORDERS = [mkorder() for x in range(5)]
 
-IMG = {
-	"C": pygame.image.load("bin/chs.png").convert(),
-	"P": pygame.image.load("bin/pep.png").convert(),
-	"V": pygame.image.load("bin/veg.png").convert(),
-	"CRUST": pygame.image.load("bin/crust.png").convert()
-}
-IMG["CRUST"].set_colorkey((0, 0, 0))
 
 def nbrs(pos, board):
 	""" generator, returns neighbors in format:
@@ -270,16 +282,16 @@ level3 = {
 }
 levels = [level1, level2, level3]
 clears = 0
-level = 0
+leveln = 0
 def drawclears(SCREEN):
-	global level, levels, clears
-	SCREEN.blit(HEL20.render("LEVEL: "+str(level+1)+" NEXT LEVEL IN: "+str(levels[level]['limit']-clears),0,(0,0,0)), (640, 270))
+	global leveln, levels, clears
+	SCREEN.blit(HEL20.render("LEVEL: "+str(leveln+1)+" NEXT LEVEL IN: "+str(levels[leveln]['limit']-clears),0,(0,0,0)), (640, 270))
 
 
 def platformer_step(level):
 	render_input(level)
 	move_and_collision(level['player'], level['platforms'])
-	for actor in [level['player']] + level['platforms'] + level['btns']:
+	for actor in level['platforms'] + level['btns'] + [level['player']]:
 		if "advance function" in actor:
 			actor['advance function'](actor,level=level)
 		if "trigger function" in actor:
@@ -296,7 +308,7 @@ while step():
 	draworders(SCREEN, ORDERS)
 	drawnext(SCREEN, next)
 	drawclears(SCREEN)
-	platformer_step(levels[level])
+	platformer_step(levels[leveln])
 	pygame.display.update()
 	if za:
 		t=0
@@ -307,7 +319,7 @@ while step():
 			drawnext(SCREEN, next)
 			drawclears(SCREEN)
 			SCREEN.blit(IMG["CRUST"], ((za[0]*60)+50,(za[1]*60)+50))
-			platformer_step(level1)
+			platformer_step(levels[leveln])
 			pygame.display.update()
 			t+=CLOCK.tick(30)
 		if tuple(POS) in [(za[0],za[1]),(za[0]+1,za[1]),(za[0],za[1]+1),(za[0]+1,za[1]+1)]:
@@ -326,5 +338,5 @@ while step():
 			level += 1
 			if level >= len(levels): 
 				print("thats all i've programmed sorry")
-				break
+				exit()
 
