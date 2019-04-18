@@ -32,8 +32,7 @@ def draw(this, destination, modifier=(0,0)):
 			img = this['img']
 		else:
 			img = this['img'][0]
-			modifier[0] += this['img'][1][0]
-			modifier[0] += this['img'][1][1]
+			modifier = modifier[0] + this['img'][1][0],  modifier[1]+ this['img'][1][1]
 		destination.blit(img, (this['rect'].x + modifier[0], this['rect'].y + modifier[1]))	
 		return
 	rect = pygame.rect.Rect((this['rect'].x + modifier[0], this['rect'].y + modifier[1]), (this['rect'].w, this['rect'].h))

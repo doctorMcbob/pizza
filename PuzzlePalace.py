@@ -2,6 +2,7 @@
 from __future__ import unicode_literals, print_function
 import pygame
 from pygame.locals import *
+import Game.gameassets
 from Game.gameassets import *
 import random as rd
 
@@ -22,12 +23,33 @@ IMG = {
 		"stand": pygame.image.load("bin/player_stand.png").convert(),
 		"fall": pygame.image.load("bin/player_fall.png").convert(),
 	},
+	"BTN":{
+		"L": pygame.image.load("bin/left_button.png").convert(),
+		"R": pygame.image.load("bin/right_button.png").convert(),
+		"D": pygame.image.load("bin/down_button.png").convert(),
+		"P": pygame.image.load("bin/pep_button.png").convert(),
+		"V": pygame.image.load("bin/veggie_button.png").convert(),
+		"C": pygame.image.load("bin/cheese_button.png").convert(),
+	},
+	"WALL": pygame.image.load("bin/wall.png").convert(),
 }
 for key in IMG["PLAYER"]:
 	IMG["PLAYER"][key].set_colorkey((254, 255, 255))
 	IMG["PLAYER"][key] = [None, IMG["PLAYER"][key], pygame.transform.flip(IMG["PLAYER"][key], 1, 0)]
 
+for key in IMG["BTN"]:
+	IMG["BTN"][key].set_colorkey((255, 255, 255))
+
 IMG["CRUST"].set_colorkey((0, 0, 0))
+
+def makeplatform(*args, **kwargs):
+	platform = Game.gameassets.makeplatform(*args, **kwargs)
+	img = pygame.surface.Surface((platform["rect"].w, platform['rect'].h))
+	for x in range(platform['rect'].w/40 +1):
+		for y in range(platform['rect'].h/40 +1):
+			img.blit(IMG['WALL'], (x*40, y*40))
+	platform["img"] = img
+	return platform
 
 def player_advance(this, **kwargs): 
 	if this['state'] == 'stand': this['jumps'] = 1
@@ -147,6 +169,7 @@ def mkbtn(rect, output):
 		"trigger function": press,
 		"state": "idle",
 		"timer": 0,
+		"img": (IMG['BTN'][output], (-10, -10)),
 
 		'rect': pygame.rect.Rect(rect),
 		'color': (50, 50, 120),
@@ -293,7 +316,7 @@ level4 = {
 	],
 }
 
-levels = [level1, level2, level3, level4][::-1]#DEBUG
+levels = [level1, level2, level3, level4]#[::-1]#DEBUG
 clears = 0
 leveln = 0
 def drawclears(SCREEN):
