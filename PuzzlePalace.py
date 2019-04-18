@@ -269,7 +269,7 @@ level2 = {
 	"btns": [mkbtn((680, 610, 20, 20), "L"), mkbtn((935, 610, 20, 20), "R"), mkbtn((800, 610, 20, 20), "D")],
 }
 level3 = {
-	"limit": 10,
+	"limit": 15,
 	"player":player,
 	"platforms": [makeplatform(rect) for rect in [
 		(640, 680, 380, 20),(640, 300, 380, 20),(640, 320, 20, 360),(980, 320, 20, 360),
@@ -280,7 +280,20 @@ level3 = {
 		mkbtn((740, 550, 20, 20), "L"), mkbtn((880, 550, 20, 20), "R"), mkbtn((810, 510, 20, 20), "D"),
 	],
 }
-levels = [level1, level2, level3]
+level4 = {
+	"limit": 15,
+	"player":player,
+	"platforms": [makeplatform(rect) for rect in [
+		(640, 680, 380, 20),(640, 300, 380, 20),(640, 320, 20, 360),(980, 320, 20, 360),
+		(660, 615, 40, 20),(940, 615, 40, 20),(730, 550, 40, 20),(870, 550, 40, 20),(800, 590, 40, 20)
+		]],
+	"btns": [
+		mkbtn((725, 640, 20, 20), "P"), mkbtn((895, 640, 20, 20), "C"), mkbtn((810, 640, 20, 20), "V"),
+		mkbtn((740, 510, 20, 20), "L"), mkbtn((880, 510, 20, 20), "R"), mkbtn((810, 550, 20, 20), "D"),
+	],
+}
+
+levels = [level1, level2, level3, level4][::-1]#DEBUG
 clears = 0
 leveln = 0
 def drawclears(SCREEN):
@@ -333,7 +346,7 @@ while step():
 		ORDERS.append(mkorder())
 		for x, y in [(za[0],za[1]),(za[0]+1,za[1]),(za[0],za[1]+1),(za[0]+1,za[1]+1)]:
 			board[y][x] = None
-		if clears >= levels[level]['limit']:
+		if clears >= levels[leveln]['limit']:
 			clears = 0
 			level += 1
 			if level >= len(levels): 
