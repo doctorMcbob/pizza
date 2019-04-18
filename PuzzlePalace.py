@@ -348,8 +348,8 @@ while step():
 			board[y][x] = None
 		if clears >= levels[leveln]['limit']:
 			clears = 0
-			level += 1
-			if level >= len(levels): 
+			leveln += 1
+			if leveln >= len(levels): 
 				print("thats all i've programmed sorry")
 				exit()
 
