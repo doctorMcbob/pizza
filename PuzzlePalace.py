@@ -1,4 +1,4 @@
-#PuzzlePalace.py
+# PuzzlePalace.py
 from __future__ import unicode_literals, print_function
 import pygame
 from pygame.locals import *
@@ -11,7 +11,7 @@ CLOCK = pygame.time.Clock()
 SCREEN = pygame.display.set_mode((1000, 700))
 
 TF1 = pygame.font.SysFont("Helvetica", 25)
-TF2 = pygame.font.SysFont("Helvetica", 50) #That Font's Zappin Mah Sentry!
+TF2 = pygame.font.SysFont("Helvetica", 50)
 
 
 IMG = {
